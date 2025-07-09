@@ -3,7 +3,7 @@ import pandas as pd
 class ExtractData:
 
     def __init__(self):
-        self.path='data_csv.csv'
+        self.path='expanded_buy_computer_data.csv'
         self.data=self.read_data()
         # self.label=self.extract_label_to_dict()
         # self.label, self.train_df, self.y_test = self.extract_train_test_split()
@@ -11,6 +11,7 @@ class ExtractData:
 
     def read_data(self):
         data=pd.read_csv(self.path)
+
         return data
 
 
