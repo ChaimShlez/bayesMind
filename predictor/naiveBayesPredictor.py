@@ -1,29 +1,50 @@
+
 import pandas as pd
-from trainer.naiveBayesTrainer import NaiveBayesTrainer
+
+
+
 
 class NaiveBayesPredictor:
 
-    def __init__(self,label,modal):
-        self.modal=modal
-        self.label = pd.Series(label)
+        def __init__(self,model,label):
+            self.model = model
+
+            if isinstance(label, dict):
+                self.label = pd.Series(label)
+            else:
+                self.label = label
+
+        def safe_sum_series(self,label):
+
+            total = 0
+            for item in label.values:
+                if isinstance(item, (int, float)):
+                    total += item
+                elif isinstance(item, dict):
+
+                    total += sum(v for v in item.values() if isinstance(v, (int, float)))
+            return total
+
+        def predictor(self, dataPred):
+            result_model = self.model
+
+            # print(self.label)
+            label=self.label
+            print(label)
 
 
+            total = self.safe_sum_series(label)
+            probs = {}
+            for label in self.label.index:
+                prob = self.label[label] / total
 
-    def predictor(self,dataPred):
+                for feature, value in dataPred.items():
+                    if feature in result_model and value in result_model[feature] and label in result_model[feature][value]:
+                        p_val = result_model[feature][value][label]
+                        prob *= p_val
+                probs[label] = prob
 
-        result_modal= self.modal
-        t_p = pd.Series(self.label)
-        total = sum(t_p)
-        probs = {}
-        for label in self.label.index:
-            prob = self.label[label] / total
 
-            for feature, value in dataPred.items():
-                if feature in result_modal and value in result_modal[feature] and label in result_modal[feature][value]:
-                    p_val = result_modal[feature][value][label]
-                    prob *= p_val
-            probs[label] = prob
-        print(f"prods-{probs}")
-
-        return max(probs, key=probs.get)
+            print(max(probs, key=probs.get))
+            return max(probs, key=probs.get)
 
