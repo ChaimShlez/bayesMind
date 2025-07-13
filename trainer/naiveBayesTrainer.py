@@ -1,5 +1,8 @@
-from extract_data.extractData import ExtractData
 import pandas as pd
+
+# from extract_data.extractCSV import ExtractData
+
+from pydantic import BaseModel
 
 class NaiveBayesTrainer:
     def __init__(self,train_df,label):
@@ -11,14 +14,14 @@ class NaiveBayesTrainer:
         print(self.label_counts)
         self.label_column = self.data.columns[-1]
         self.label_values = self.data[self.label_column].unique()
-        self.dict_modal=self.extract_ratios_with_pandas()
+        # self.dict_modal=self.extract_ratios_with_pandas()
 
 
 
 
 
 
-    def extract_ratios_with_pandas(self):
+    def train(self):
         modal = {}
 
         for column in self.data.columns[:-1]:
@@ -34,3 +37,5 @@ class NaiveBayesTrainer:
             modal[column] = smoothed.to_dict(orient='index')
 
         return modal
+
+
