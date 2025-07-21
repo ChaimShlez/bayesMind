@@ -2,9 +2,10 @@ from typing import Any, Dict, List
 
 import httpx
 import pandas as pd
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from cleanAndSplitData.splitData import SplitData
+from splitData import SplitData
 
 app = FastAPI()
 
@@ -30,15 +31,14 @@ async def clean(input: InputData):
         print(y_test)
         await send_to_trainer(df_data,label)
 
-        await send_to_evaluator(x_test,y_test)
-        # return {
-        #     "data": {
-        #         "df_data": df_data.to_dict(orient="records"),
-        #         "x_test": x_test.to_dict(orient="records"),
-        #         "y_test": y_test.tolist()
-        #     },
-        #     "label": label
-        # }
+
+        eval_result = await send_to_evaluator(x_test, y_test)
+
+        return {
+            "train_status": "OK",
+            "evaluator_result": eval_result
+        }
+
     except Exception as e:
         print(f"Error in clean function: {e}")
         raise HTTPException(status_code=500, detail=f"Error processing data: {str(e)}")
@@ -49,7 +49,7 @@ async def send_to_trainer(df_data, label):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(
-                "http://127.0.0.1:8002/train",
+                "http://trainer:8002/train",
                 json={
                     "features": df_data.to_dict(orient="records"),
                     "labels": label
@@ -58,7 +58,7 @@ async def send_to_trainer(df_data, label):
             )
             print(f"Response status: {response.status_code}")
             if response.status_code == 200:
-                return response.json()
+                return  response.json()
             else:
                 print(f"Error response: {response.text}")
         except Exception as e:
@@ -70,14 +70,20 @@ async def send_to_trainer(df_data, label):
 async def send_to_evaluator(x_test, y_test):
     async with httpx.AsyncClient() as client:
         try:
-            response=await client.post("http://127.0.0.1:8002/evaluator",
+            response=await client.post("http://trainer:8002/evaluator",
                 json={"features": x_test.to_dict(orient="records"),  "labels": y_test.tolist()})
 
             print(f"Response status: {response.status_code}")
             if response.status_code == 200:
-               return response.json()
+               return  response.json()
             else:
               print(f"Error response: {response.text}")
         except Exception as e:
           print(f"Error sending to train service: {e}")
           raise HTTPException(status_code=500, detail="Failed to send data to evaluator service")
+
+
+
+if __name__ == "__main__":
+
+    uvicorn.run(app, host="0.0.0.0", port=8001)
