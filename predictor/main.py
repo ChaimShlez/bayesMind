@@ -2,8 +2,8 @@ import json
 from typing import Dict, Any
 from fastapi import FastAPI
 from pydantic import BaseModel
-
-from predictor.naiveBayesPredictor import NaiveBayesPredictor
+import uvicorn
+from naiveBayesPredictor import NaiveBayesPredictor
 
 
 class PredictorRequest(BaseModel):
@@ -14,10 +14,12 @@ app=FastAPI()
 async def predictor(data:PredictorRequest):
     target=data.target
 
-    with open("model.json", "r") as f:
+    path_model = "/app/output/json/model.json"
+    path_label = "/app/output/json/label.json"
+    with open(path_model, "r") as f:
         model_dict = json.load(f)
 
-    with open("label.json", "r") as f:
+    with open(path_label, "r") as f:
         label_dict = json.load(f)
 
     # label_test = pd.Series(data.labels)
@@ -25,3 +27,6 @@ async def predictor(data:PredictorRequest):
     result = predict.predictor(target)
 
     return {"prediction": result}
+if __name__ == "__main__":
+
+    uvicorn.run(app, host="0.0.0.0", port=8003)

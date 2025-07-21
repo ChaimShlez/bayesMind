@@ -1,4 +1,5 @@
 import pandas as pd
+import uvicorn
 from fastapi import FastAPI, UploadFile, HTTPException, File
 from pydantic import BaseModel
 import httpx
@@ -38,10 +39,10 @@ async def upload(file: UploadFile = File(...)):
 async def send_to_clean(data):
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post("http://127.0.0.1:8001/clean", json={"data": data})
+            response = await client.post("http://clean_and_split:8001/clean", json={"data": data})
             print(f"Response status: {response.status_code}")
             if response.status_code == 200:
-                model_response = response.json()
+                model_response =  response.json()
 
                 return model_response
             else:
@@ -49,3 +50,9 @@ async def send_to_clean(data):
         except Exception as e:
             print(f"Error sending to clean service: {e}")
             raise HTTPException(status_code=500, detail="Failed to send data to clean service")
+
+
+
+if __name__ == "__main__":
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

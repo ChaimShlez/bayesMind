@@ -1,7 +1,8 @@
-from manager import Manager
+from UI.manager import Manager
 
 if __name__ == "__main__":
-    Manager()
+   m= Manager()
+   m.menu()
 
 # from fastapi import FastAPI
 # from pydantic import BaseModel

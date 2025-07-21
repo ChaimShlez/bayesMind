@@ -1,8 +1,6 @@
 import io
-
 import pandas as pd
-
-from extract_data.IExtract import IExtract
+from base.IExtract import IExtract
 
 
 class ExtractCSV(IExtract):
@@ -18,6 +16,7 @@ class ExtractCSV(IExtract):
         file_csv = io.StringIO(content.decode("utf-8"))
 
         data=pd.read_csv( file_csv)
+
         # print(data)
         # data=data.to_dict()
 
