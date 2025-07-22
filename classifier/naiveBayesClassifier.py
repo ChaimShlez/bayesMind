@@ -3,15 +3,15 @@ import pandas as pd
 
 class NaiveBayesClassifier:
 
-    def __init__(self,label,modal):
-        self.modal=modal
+    def __init__(self,label,model):
+        self.model=model
         self.label = pd.Series(label)
 
 
 
     def predictor(self,dataPred):
 
-        result_modal= self.modal
+        result_modal= self.model
         t_p = pd.Series(self.label)
         total = sum(t_p)
         probs = {}

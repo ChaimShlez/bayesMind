@@ -1,6 +1,6 @@
 import pandas as pd
-from base.IDataLoader import IDataLoader
-from logHandler.logConfig import
+from model.base.IDataLoader import IDataLoader
+from model.logHandler.logConfig import
 
 class DataLoaderCSV(IDataLoader):
 

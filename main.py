@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from manager import Manager
+from model.manager import Manager
 
 app = FastAPI()
 
