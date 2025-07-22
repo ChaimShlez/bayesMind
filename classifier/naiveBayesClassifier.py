@@ -1,7 +1,7 @@
 import pandas as pd
-from trainer.naiveBayesTrainer import NaiveBayesTrainer
 
-class NaiveBayesPredictor:
+
+class NaiveBayesClassifier:
 
     def __init__(self,label,modal):
         self.modal=modal

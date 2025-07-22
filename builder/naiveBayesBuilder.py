@@ -1,7 +1,7 @@
-from extract_data.extractData import ExtractData
+
 import pandas as pd
 
-class NaiveBayesTrainer:
+class NaiveBayesBuilder:
     def __init__(self,train_df,label):
 
         self.data = train_df

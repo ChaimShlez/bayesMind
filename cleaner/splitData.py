@@ -1,4 +1,4 @@
-from sklearn.model_selection import train_test_split
+
 import pandas as pd
 
 class SplitData:
@@ -31,8 +31,6 @@ class SplitData:
 
         x_test = x[split_index:]
         y_test = y[split_index:]
-
-        # x_train, x_test, y_train, y_test = train_test_split( x, y, test_size=0.33, random_state=42)
 
         df_data = pd.concat([x_train, y_train], axis=1)
         return df_data,  x_test, y_test

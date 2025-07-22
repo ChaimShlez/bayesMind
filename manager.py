@@ -1,25 +1,39 @@
-from extract_data.extractData import ExtractData
-from cleanAndSplitData.splitData import SplitData
-from trainer.naiveBayesTrainer import NaiveBayesTrainer
-from predictor.naiveBayesPredictor import NaiveBayesPredictor
-from trainer.evaluator import Evaluator
+from dataLoader.dataLoaderCSV import DataLoaderCSV
+from cleaner.splitData import SplitData
+from builder.naiveBayesBuilder import NaiveBayesBuilder
+from classifier.naiveBayesClassifier import NaiveBayesClassifier
+from builder.validator import Validator
+from logHandler.logConfig import LogConfig
+
 class Manager:
     def __init__(self):
-        extractor=ExtractData()
-        self.data=extractor.read_data()
+        self.logger = LogConfig.get_logger("manager")
+        self.extractor = DataLoaderCSV()
+        self.splitter = None
+        self.trainer = None
+        self.evaluator = None
+        self.predictor = None
 
-        splitData=SplitData(self.data)
-        self.label=splitData.extract_label()
-        self.df_data, self.x_test, self.y_test = splitData.split_from_test_modal()
+    def run(self):
+        self.logger.info("Manager started running")
 
-        trainer_modal = NaiveBayesTrainer(self.df_data, self.label)
-        modal=trainer_modal.extract_ratios_with_pandas()
-        print(f"misal:{modal}")
+        data = self.extractor.read_data()
+        self.logger.info(f"Data loaded with {len(data)} rows")
 
-        evaluator=Evaluator(self.label ,modal)
-        evaluator.Evolution_train(self.x_test, self.y_test)
+        self.splitter = SplitData(data)
+        label = self.splitter.extract_label()
+        df_data, x_test, y_test = self.splitter.split_from_test_modal()
+        self.logger.info("Data split into training and test sets")
 
-        predictor= NaiveBayesPredictor(self.label,modal)
+        self.trainer = NaiveBayesBuilder(df_data, label)
+        model = self.trainer.extract_ratios_with_pandas()
+        self.logger.info(f"Model extracted: {model}")
+
+        self.evaluator = Validator(label, model)
+        self.evaluator.Validator_train(x_test, y_test)
+        self.logger.info("Model evaluation completed")
+
+        self.predictor = NaiveBayesClassifier(label, model)
 
         sample = {
             "age": "youth",
@@ -31,7 +45,11 @@ class Manager:
             "Buy_Computer": "yes"
         }
 
-        result = predictor.predictor(sample)
+        result = self.predictor.predictor(sample)
+        self.logger.info(f"Prediction result: {result}")
         print("Prediction result:", result)
 
 
+if __name__ == "__main__":
+    manager = Manager()
+    manager.run()
