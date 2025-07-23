@@ -1,11 +1,13 @@
 import pandas as pd
-from model.base.IDataLoader import IDataLoader
-from model.logHandler.logConfig import
+from base.IDataLoader import IDataLoader
+from logHandler.logConfig import LogConfig
+
+
 
 class DataLoaderCSV(IDataLoader):
 
     def __init__(self):
-        self.logger = get_logger("loader")
+        self.logger = LogConfig.get_logger("loader")
         self.path = 'data.csv'
         self.data = self.read_data()
 

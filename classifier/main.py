@@ -1,9 +1,11 @@
+import httpx
 import json
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from naiveBayesClassifier import NaiveBayesClassifier
+
 app = FastAPI()
+
 
 class SampleInput(BaseModel):
     age: str
@@ -14,21 +16,18 @@ class SampleInput(BaseModel):
     married: str
 
 
-
-
-
 @app.post("/predict")
-def predict(sample: SampleInput):
+async def predict(sample: SampleInput):
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.get("http://model-service:8000/model")
+            resp.raise_for_status()
+            payload = resp.json()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error fetching model: {e}")
 
-    sample_dict = sample.dict()
-
-    path_model = "data_model/model.json"
-    path_label = "data_model/label.json"
-    with open(path_model, "r") as f:
-        model = json.load(f)
-
-    with open(path_label, "r") as f:
-        label = json.load(f)
-    classifier=NaiveBayesClassifier(label,model)
-    result = classifier.predictor(sample_dict)
+    model = payload["model"]
+    label = payload["label"]
+    classifier = NaiveBayesClassifier(label, model)
+    result = classifier.predictor(sample.dict())
     return {"prediction": result}

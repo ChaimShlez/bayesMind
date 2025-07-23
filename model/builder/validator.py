@@ -1,5 +1,5 @@
 import pandas as pd
-from classifier.naiveBayesClassifier import NaiveBayesClassifier
+
 
 
 class Validator:
