@@ -1,7 +1,9 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from manager import Manager
 
-app = FastAPI()
+
 
 
 modal_naive = None
@@ -9,11 +11,16 @@ label = None
 
 manager = Manager()
 
-@app.on_event("startup")
-def startup_event():
-    global modal_naive, label
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global modal_naive, label
     modal_naive, label = manager.run()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/model")
 def get_model():
