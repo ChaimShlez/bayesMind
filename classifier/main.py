@@ -1,5 +1,6 @@
 import httpx
 import json
+import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from naiveBayesClassifier import NaiveBayesClassifier
@@ -18,6 +19,7 @@ class SampleInput(BaseModel):
 
 @app.post("/predict")
 async def predict(sample: SampleInput):
+    await asyncio.sleep(1.5)
     async with httpx.AsyncClient() as client:
         try:
             resp = await client.get("http://model-service:8000/model")
